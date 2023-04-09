@@ -8,26 +8,21 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
-SDL_Event event;
 Uint8 running = 1;
 
 int main()
 {
     time_t t;
     struct tm tm;
-    t = time(NULL);
-    tm = *localtime(&t);
-    // printf("Current Time: %d:%d:%d", tm.tm_hour, tm.tm_min, tm.tm_sec);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("Video init failed: %s", SDL_GetError());
     }
 
-    // Uint32 flags = 0;
-    Uint32 flags = SDL_WINDOW_BORDERLESS;
+    Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP;
 
-    window = SDL_CreateWindow("asd", SDL_WINDOWPOS_CENTERED, 100, 150, 30, flags);
+    window = SDL_CreateWindow("clock_widget", SDL_WINDOWPOS_CENTERED, 30, 168, 36, flags);
     if (window < 0)
     {
         printf("Window init failed: %s", SDL_GetError());
@@ -36,33 +31,24 @@ int main()
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     FC_Font *font = FC_CreateFont();
-    FC_LoadFont(font, renderer, "LiberationSans-Regular.ttf", 28, FC_MakeColor(255, 0, 0, 255), TTF_STYLE_NORMAL);
+    FC_LoadFont(font, renderer, "LiberationSans-Regular.ttf", 40, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
 
-    while (running)
+    int runtime = 0;
+    while (runtime < 3000)
     {
-        SDL_PollEvent(&event);
-        if (event.type == SDL_QUIT)
-        {
-            running = 0;
-        }
-
-        
-
-        SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-
-        // FC_Draw(font, renderer, 0, 0, "This is %s.\n It works.", "example text");
         t = time(NULL);
         tm = *localtime(&t);
-        FC_Draw(font, renderer, 5, 2, "%.2d:%.2d:%.2d", tm.tm_hour, tm.tm_min, tm.tm_sec);
 
+        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+        SDL_RenderClear(renderer);
+        FC_Draw(font, renderer, 5, 2, "%.2d:%.2d:%.2d", tm.tm_hour, tm.tm_min, tm.tm_sec);
         SDL_RenderPresent(renderer);
 
-        SDL_Delay(30);
+        runtime = SDL_GetTicks();
+        SDL_Delay(500);
     }
 
     FC_FreeFont(font);
-
     SDL_Quit();
     return 0;
 }
